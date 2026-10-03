@@ -1,0 +1,326 @@
+# Mini 4-bit ALU
+
+## 1. Project Overview
+
+This project is a small 4-bit Arithmetic Logic Unit (ALU) designed and simulated using Logisim-evolution.
+
+The ALU receives two 4-bit operands and performs one of four operations: AND, OR, XOR, or addition. A 2-bit control signal selects the result sent to the output.
+
+This is my first digital design portfolio project. Its purpose is to practice combinational logic, modular circuit design, verification, and debugging.
+
+## 2. Features
+
+- Two 4-bit input operands
+- Four operations: AND, OR, XOR, and ADD
+- Operation selection using a 4-to-1 multiplexer
+- 4-bit Ripple Carry Adder built from four 1-bit Full Adders
+- Separate and reusable subcircuits
+- Block-level and integration testing
+- Carry-out output for addition
+
+## 3. Inputs and Outputs
+
+| Signal | Width | Direction | Description |
+|---|---:|---|---|
+| `A[3:0]` | 4 bits | Input | First operand |
+| `B[3:0]` | 4 bits | Input | Second operand |
+| `SEL[1:0]` | 2 bits | Input | Selects the ALU operation |
+| `Y[3:0]` | 4 bits | Output | Result of the selected operation |
+| `Cout` | 1 bit | Output | Final carry-out from `ADD_4bit`; meaningful for ADD |
+
+## 4. Operation Selection
+
+| SEL | Operation | Function |
+|---|---|---|
+| `00` | AND | `Y = A AND B` |
+| `01` | OR | `Y = A OR B` |
+| `10` | XOR | `Y = A XOR B` |
+| `11` | ADD | `Y = A + B` |
+
+For the ADD operation, the lower four result bits are sent to `Y[3:0]`, while the final carry is provided through `Cout`.
+
+## 5. Architecture
+
+The two input operands, `A[3:0]` and `B[3:0]`, are connected in parallel to four functional blocks:
+
+- `AND_4bit`
+- `OR_4bit`
+- `XOR_4bit`
+- `ADD_4bit`
+
+Each block produces a 4-bit result. The four results are connected to a 4-to-1 multiplexer. The `SEL[1:0]` control signal selects which result is sent to `Y[3:0]`.
+
+```text
+A[3:0], B[3:0]
+        |
+        +--> AND_4bit ----+
+        +--> OR_4bit -----+
+        +--> XOR_4bit ----+--> 4-to-1 MUX --> Y[3:0]
+        +--> ADD_4bit ----+
+                           ^
+                           |
+                       SEL[1:0]
+```
+
+![Mini 4-bit ALU Top-Level](images/alu_top_level.png)
+
+## 6. Design Blocks
+
+### 6.1 AND_4bit
+
+The `AND_4bit` block performs a bitwise AND operation:
+
+```text
+Y[3:0] = A[3:0] AND B[3:0]
+```
+
+Example:
+
+```text
+A = 1010
+B = 1101
+Y = 1000
+```
+
+![4-bit AND Block](images/and_4bit.png)
+
+### 6.2 OR_4bit
+
+The `OR_4bit` block performs a bitwise OR operation:
+
+```text
+Y[3:0] = A[3:0] OR B[3:0]
+```
+
+Example:
+
+```text
+A = 1100
+B = 0011
+Y = 1111
+```
+
+![4-bit OR Block](images/or_4bit.png)
+
+### 6.3 XOR_4bit
+
+The `XOR_4bit` block performs a bitwise XOR operation:
+
+```text
+Y[3:0] = A[3:0] XOR B[3:0]
+```
+
+Example:
+
+```text
+A = 1001
+B = 0011
+Y = 1010
+```
+
+![4-bit XOR Block](images/xor_4bit.png)
+
+### 6.4 ADD_4bit
+
+The `ADD_4bit` block is a 4-bit Ripple Carry Adder built from four 1-bit Full Adders.
+
+`FA0` processes bit 0, the least significant bit. `FA3` processes bit 3, the most significant bit. The carry-out of each stage is connected to the carry-in of the next stage:
+
+```text
+FA0.Cout -> FA1.Cin
+FA1.Cout -> FA2.Cin
+FA2.Cout -> FA3.Cin
+```
+
+The four individual sum bits are combined to form `SUM[3:0]`. The carry-out from `FA3` becomes the final `Cout`.
+
+The initial `Cin` of `ADD_4bit` is set to `0` in the current ALU.
+
+![4-bit Ripple Carry Adder](images/add_4bit.png)
+
+### 6.5 Full Adder 1-bit
+
+The 1-bit Full Adder receives three inputs and produces two outputs:
+
+| Signal | Direction | Description |
+|---|---|---|
+| `A` | Input | First input bit |
+| `B` | Input | Second input bit |
+| `Cin` | Input | Carry-in |
+| `Sum` | Output | Sum bit |
+| `Cout` | Output | Carry-out |
+
+The circuit is built using:
+
+- 2 XOR gates
+- 2 AND gates
+- 1 OR gate
+
+Its internal logic is:
+
+```text
+S1   = A XOR B
+C1   = A AND B
+Sum  = S1 XOR Cin
+C2   = S1 AND Cin
+Cout = C1 OR C2
+```
+
+![1-bit Full Adder](images/full_adder_1bit.png)
+
+## 7. Hierarchical Design
+
+The project uses a hierarchical and modular structure:
+
+```text
+Mini 4-bit ALU
+|
+|-- AND_4bit
+|-- OR_4bit
+|-- XOR_4bit
+|
+`-- ADD_4bit
+    |
+    |-- Full Adder 0
+    |-- Full Adder 1
+    |-- Full Adder 2
+    `-- Full Adder 3
+```
+
+Dividing the ALU into smaller subcircuits made each function easier to build and test. It also allowed the same 1-bit Full Adder design to be reused four times inside `ADD_4bit`.
+
+Each functional block was tested separately before being integrated into the complete ALU.
+
+## 8. Verification
+
+### 8.1 Test Strategy
+
+Verification was performed in two stages:
+
+1. Test the AND, OR, XOR, Full Adder, and Ripple Carry Adder blocks separately.
+2. Integrate the blocks into the ALU and test all operations through `SEL[1:0]`.
+
+The following operation mapping was checked during integration testing:
+
+```text
+SEL = 00 -> AND
+SEL = 01 -> OR
+SEL = 10 -> XOR
+SEL = 11 -> ADD
+```
+
+The test cases include zero inputs, different bit patterns, and additions with and without carry-out.
+
+### 8.2 Test Results
+
+| Test | A | B | AND | OR | XOR | ADD | Cout |
+|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | `1010` | `1100` | `1000` | `1110` | `0110` | `0110` | `1` |
+| 2 | `0000` | `0000` | `0000` | `0000` | `0000` | `0000` | `0` |
+| 3 | `1010` | `0101` | `0000` | `1111` | `1111` | `1111` | `0` |
+| 4 | `1111` | `0001` | `0001` | `1111` | `1110` | `0000` | `1` |
+| 5 | `1111` | `1111` | `1111` | `1111` | `0000` | `1110` | `1` |
+
+An additional integrated test used:
+
+```text
+A = 1011
+B = 1101
+```
+
+| SEL | Operation | Y | Cout |
+|:---:|---|:---:|:---:|
+| `00` | AND | `1001` | Not used |
+| `01` | OR | `1111` | Not used |
+| `10` | XOR | `0110` | Not used |
+| `11` | ADD | `1000` | `1` |
+
+## 9. Debugging and Lessons Learned
+
+### Symptom
+
+The `ADD_4bit` block produced incorrect results after it was integrated into the complete ALU. Some individual tests appeared correct, but other input combinations failed.
+
+### Root Cause
+
+The problem was inside the 1-bit Full Adder subcircuit. Its carry logic was incomplete or connected incorrectly.
+
+Because `ADD_4bit` uses four Full Adders, an error in this sub-block affected the carry chain and caused the final ALU result to be incorrect.
+
+### How the Bug Was Found
+
+I traced the result backward through the design hierarchy:
+
+```text
+Top-level ALU
+    -> ADD_4bit
+        -> Full Adder 1-bit
+```
+
+Testing the smaller blocks separately helped identify the Full Adder as the source of the error.
+
+### Fix
+
+I corrected the Full Adder carry logic and checked the Ripple Carry connections:
+
+```text
+FA0.Cout -> FA1.Cin
+FA1.Cout -> FA2.Cin
+FA2.Cout -> FA3.Cin
+```
+
+### Regression Test
+
+After the fix, I repeated the addition tests, including cases that generate a carry:
+
+| A | B | SUM | Cout |
+|:---:|:---:|:---:|:---:|
+| `1001` | `1001` | `0010` | `1` |
+| `1111` | `0001` | `0000` | `1` |
+| `1111` | `1111` | `1110` | `1` |
+
+This debugging process showed me why testing both individual subcircuits and the complete integrated design is important.
+
+## 10. Project Structure
+
+```text
+mini-4bit-alu/
+|
+|-- circuit/
+|   `-- mini_4bit_alu.circ
+|
+|-- images/
+|   |-- alu_top_level.png
+|   |-- and_4bit.png
+|   |-- or_4bit.png
+|   |-- xor_4bit.png
+|   |-- add_4bit.png
+|   `-- full_adder_1bit.png
+|
+`-- README.md
+```
+
+## 11. What I Learned
+
+Through this project, I practiced:
+
+- Building combinational logic circuits
+- Working with 4-bit buses
+- Implementing bitwise AND, OR, and XOR operations
+- Selecting results with a multiplexer
+- Building a 1-bit Full Adder from logic gates
+- Connecting Full Adders as a Ripple Carry Adder
+- Dividing a design into reusable subcircuits
+- Testing individual blocks before integration
+- Performing integration tests on the complete ALU
+- Tracing an error from the top-level circuit to a sub-block
+- Repeating tests after correcting a design error
+
+## 12. Current Scope
+
+This project is a learning project designed and simulated in Logisim-evolution.
+
+Its current scope is a small combinational 4-bit ALU with four operations: AND, OR, XOR, and ADD. The project focuses on basic digital logic, hierarchical design, verification, and debugging.
+
+
+
