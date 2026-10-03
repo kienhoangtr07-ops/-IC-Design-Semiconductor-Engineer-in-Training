@@ -81,4 +81,4 @@ More projects will be added as I continue learning.
 ## Contact
 
 - GitHub: [kienhoangtr07-ops](https://github.com/kienhoangtr07-ops)
-- Email: `your-email@example.com`
+- Email: `kienhoangtr07@gmail.com`
