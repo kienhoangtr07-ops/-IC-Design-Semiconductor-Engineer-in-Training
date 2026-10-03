@@ -1,6 +1,6 @@
 <div align="center">
 
-# Mini 4-bit ALU
+# Project 1 — Mini 4-bit ALU
 
 **A small combinational ALU designed and simulated in Logisim-evolution**
 
@@ -9,6 +9,8 @@
 ![Status](https://img.shields.io/badge/Status-Completed-0F766E)
 
 </div>
+
+[← Back to Portfolio](README.md)
 
 ---
 
@@ -95,7 +97,7 @@ A[3:0], B[3:0]
 
 ### Top-Level Circuit
 
-![Mini 4-bit ALU Top-Level](images/alu_top_level.png)
+![Mini 4-bit ALU Top-Level](images/project1/alu_top_level.png)
 
 ---
 
@@ -111,7 +113,7 @@ Y[3:0] = A[3:0] AND B[3:0]
 
 Example: `1010 AND 1101 = 1000`
 
-![4-bit AND Block](images/and_4bit.png)
+![4-bit AND Block](images/project1/and_4bit.png)
 
 ### OR_4bit
 
@@ -123,7 +125,7 @@ Y[3:0] = A[3:0] OR B[3:0]
 
 Example: `1100 OR 0011 = 1111`
 
-![4-bit OR Block](images/or_4bit.png)
+![4-bit OR Block](images/project1/or_4bit.png)
 
 ### XOR_4bit
 
@@ -135,7 +137,7 @@ Y[3:0] = A[3:0] XOR B[3:0]
 
 Example: `1001 XOR 0011 = 1010`
 
-![4-bit XOR Block](images/xor_4bit.png)
+![4-bit XOR Block](images/project1/xor_4bit.png)
 
 ### ADD_4bit
 
@@ -151,7 +153,7 @@ FA2.Cout --> FA3.Cin
 
 The four sum bits are combined to form `SUM[3:0]`. The carry-out from `FA3` becomes the final `Cout`. The initial `Cin` is set to `0` in the current ALU.
 
-![4-bit Ripple Carry Adder](images/add_4bit.png)
+![4-bit Ripple Carry Adder](images/project1/add_4bit.png)
 
 ### Full Adder 1-bit
 
@@ -173,7 +175,7 @@ C2   = S1 AND Cin
 Cout = C1 OR C2
 ```
 
-![1-bit Full Adder](images/full_adder_1bit.png)
+![1-bit Full Adder](images/project1/full_adder_1bit.png)
 
 ---
 
@@ -279,20 +281,22 @@ This process helped me understand why both block-level testing and integration t
 ## Project Structure
 
 ```text
-mini-4bit-alu/
+IC-Design-Semiconductor-Engineer-in-Training/
 |
-|-- circuit/
-|   `-- mini_4bit_alu.circ
+|-- README.md
+|-- Project1.md
 |
 |-- images/
-|   |-- alu_top_level.png
-|   |-- and_4bit.png
-|   |-- or_4bit.png
-|   |-- xor_4bit.png
-|   |-- add_4bit.png
-|   `-- full_adder_1bit.png
+|   `-- project1/
+|       |-- alu_top_level.png
+|       |-- and_4bit.png
+|       |-- or_4bit.png
+|       |-- xor_4bit.png
+|       |-- add_4bit.png
+|       `-- full_adder_1bit.png
 |
-`-- README.md
+`-- circuit/
+    `-- mini_4bit_alu.circ
 ```
 
 ---
