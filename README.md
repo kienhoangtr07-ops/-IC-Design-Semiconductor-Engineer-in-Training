@@ -1,1 +1,1 @@
-# -IC-Design-Semiconductor-Engineer-in-Training
+# IC-Design-Semiconductor-Engineer-in-Training
